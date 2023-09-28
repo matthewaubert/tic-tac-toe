@@ -21,22 +21,22 @@ The interface should additionally initially allow a user to select whether they 
 ## Plan
 
 1. The main goal is to have as little global code as possible. I need to try tucking everything away inside of a module or factory function. Rule of thumb: if I need ONE of something (e.g. gameBoard, displayController), use a module; if I need multiples (e.g. players), use a factory function.
-  - Store the gameboard as an array inside of a gameboard object.
-  - Store the players in objects.
-  - I'll need an object to control the flow of the game itself.
+   - Store the gameboard as an array inside of a gameboard object.
+   - Store the players in objects.
+   - I'll need an object to control the flow of the game itself.
 
 2. Set up HTML and CSS
 
 3. Write a JavaScript function that will render the contents of the gameboard array to the webpage (initially just manually fill the array with Xs and Os)
 
 4. Build the functions that allow players to place marks on a specific spot on the board; tie it to the DOM
-  - Think carefully about where each bit of logic should reside: game, player, or gameboard object
+   - Think carefully about where each bit of logic should reside: game, player, or gameboard object
 
 5. Build logic that checks for when the game is over: 3-in-a-row and tie.
 
 6. Finishing touches:
-  1. Button to start/restart the game
-  2. Display element that congratulates the winning player
-  3. Display element that keeps track of scores
+   1. Button to start/restart the game
+   2. Display element that congratulates the winning player
+   3. Display element that keeps track of scores
 
 7. AI...
