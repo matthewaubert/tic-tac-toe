@@ -2,9 +2,9 @@
 const gameboard = (function() {
 
   // array defining marks at each square: 'x', 'o', or undefined (i.e. unmarked)
-  const gameData = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-  const getGameData = () => gameData;
-  const placeMark = (mark, loc) => gameData.splice(loc, 1, mark);
+  const _gameData = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+  const getGameData = () => _gameData;
+  const placeMark = (mark, loc) => _gameData.splice(loc, 1, mark);
 
   return { getGameData, placeMark };
 
