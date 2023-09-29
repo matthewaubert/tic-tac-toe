@@ -2,36 +2,38 @@
 const gameboard = (function() {
 
   // array defining marks at each square: 'x', 'o', or undefined (i.e. unmarked)
-  const _gameData = ['x', undefined, undefined, undefined, undefined, 'x', undefined, 'o', undefined];
+  const _gameData = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
   const getGameData = () => _gameData;
-  const placeMark = (mark, loc) => _gameData.splice(loc, 1, mark);
 
   // cache dom
   const _cells = document.querySelectorAll('.cell');
 
-  // bind events
-  // _cells.forEach(cell => cell.addEventListener('click', doSomething));
-
   _renderAll();
+
+  // change mark in _gameData array and render cell
+  function placeMark (mark, index) {
+    _gameData.splice(index, 1, mark);
+    _render(_cells[index], index);
+  }
 
   function _renderAll() {
     _cells.forEach((cell, i) => _render(cell, i));
   }
 
   function _render(cell, index) {
-    if (_gameData[index] != undefined) {
+    if (_gameData[index] !== undefined) {
       const mark = _createSvg(_gameData[index]); // create appropriate svg
       cell.appendChild(mark); // append svg to cell
     }
   }
 
   // create an 'x' or 'o' inline SVG image
-  function _createSvg(marker) {
+  function _createSvg(mark) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.classList.add(marker);
+    svg.classList.add(mark);
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
-    if (marker == 'x') {
+    if (mark === 'x') {
       svg.setAttribute('viewBox', '22 33.25 431 428.9');
       path.setAttribute('d', 'M336 248l88 -88q19 -18 25.5 -33.5t0.5 -31t-24 -33.5q-19 -19 -34.5 -25.5t-31 0t-33.5 24.5l-89 89l-89 -88q-18 -19 -34 -25.5t-31.5 0t-33.5 24.5q-19 19 -25 34.5t1 31t25 33.5l88 88l-90 90q-18 18 -24 33t0 30.5t25 34.5q19 18 34.5 23.5t31 -0.5t33.5 -23l89 -89l89 89q17 18 32.5 23.5t31.5 -0.5t35 -23q18 -19 24 -34.5t0 -30.5t-24 -33z');
     } else {
@@ -49,11 +51,11 @@ const gameboard = (function() {
 })();
 
 // factory function to create player objects
-function Player(marker) {
+function Player(mark) {
 
-  const getMarker = () => marker;
+  const getMark = () => mark;
 
-  return { getMarker };
+  return { getMark };
 
 };
 
@@ -61,11 +63,30 @@ function Player(marker) {
 const gameController = (function() {
 
   // cache DOM
+  const _board = document.querySelector('#gameboard');
+
+  // cache Player objects
+  const _playerSelection = 'x';
+  const player1 = Player(_playerSelection);
+  const player2 = player1.getMark() === 'x' ? Player('o') : Player('x');
 
   // bind events
+  _board.addEventListener('click', _placeMark);
 
-  // render function
+  // turn variable
+  let _turn = player1.getMark() === 'x' ? player1 : player2;
 
-  return {};
+  // place mark when board is clicked
+  function _placeMark(e) {
+    const cellIndex = e.target.dataset.index;
+    // if no mark on cell
+    if (cellIndex !== undefined && gameboard.getGameData()[cellIndex] === undefined) {
+      // add appropriate mark to square and change appropriate mark in _gameData array
+      gameboard.placeMark(_turn.getMark(), cellIndex);
+      _turn = _turn === player1 ? player2 : player1; // change turn
+    }
+  }
+
+  return { player1, player2 };
 
 })();
