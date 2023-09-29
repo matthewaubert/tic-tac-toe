@@ -1,4 +1,4 @@
-// module to return gameboard object
+// module to control gameboard
 const gameboard = (function() {
 
   // array defining marks at each square: 'x', 'o', or undefined (i.e. unmarked)
@@ -63,7 +63,7 @@ function Player(mark) {
 
 };
 
-// module to return gameController object
+// module to control flow of game
 const gameController = (function() {
 
   // cache DOM
@@ -71,19 +71,17 @@ const gameController = (function() {
 
   // cache Player objects
   const _playerSelection = 'x';
-  const player1 = Player(_playerSelection);
-  const player2 = player1.getMark() === 'x' ? Player('o') : Player('x');
+  const _player1 = Player(_playerSelection);
+  const _player2 = _player1.getMark() === 'x' ? Player('o') : Player('x');
+  let activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
 
   // bind events
   _board.addEventListener('click', _playRound);
 
-  // active player variable
-  let _activePlayer = player1.getMark() === 'x' ? player1 : player2;
-
   // place mark when board is clicked
   function _playRound(e) {
     const cellIndex = e.target.dataset.index;
-    const mark = _activePlayer.getMark();
+    const mark = activePlayer.getMark();
     // if no mark on cell
     if (cellIndex !== undefined && gameboard.getGameData()[cellIndex] === undefined) {
       // add appropriate mark to square and change appropriate mark in _gameData array
@@ -95,21 +93,24 @@ const gameController = (function() {
 
     // change turn
     function _switchActivePlayer() {
-      _activePlayer = mark === player1.getMark() ? player2 : player1;
+      activePlayer = mark === _player1.getMark() ? _player2 : _player1;
     }
 
     // check if conditions are met to end game
     function _checkGameOver() {
       gameData = gameboard.getGameData();
-      const mark = _activePlayer.getMark();
+      const mark = activePlayer.getMark();
 
       console.log(`win? ${checkWin()}`);
       console.log(`tie? ${checkTie()}`);
-      // if (checkWin()) {
-      //   // do something
-      // } elif (checkTie()) {
-      //   // do something else
-      // }
+
+      if (checkWin()) {
+        displayController.renderGameOver('win');
+        _board.removeEventListener('click', _playRound);
+      } else if (checkTie()) {
+        displayController.renderGameOver('tie');
+        _board.removeEventListener('click', _playRound);
+      }
 
       function checkWin() {
         // 8 possible ways to win
@@ -156,6 +157,21 @@ const gameController = (function() {
     }
   }
 
-  return { player1, player2 };
+  return { activePlayer };
+
+})();
+
+// module to control misc display elements
+const displayController = (function() {
+
+  // cache DOM
+  const _gameOverBanner = document.querySelector('#game-over');
+
+  // show 'Game Over' banner that announces result of game, congratulates winner
+  function renderGameOver() {
+    _gameOverBanner.classList.toggle('hidden');
+  }
+
+  return { renderGameOver };
 
 })();
