@@ -2,7 +2,11 @@
 const gameboard = (function() {
 
   // array defining marks at each square: 'x', 'o', or undefined (i.e. unmarked)
-  const _gameData = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+  const _gameData = [
+    undefined, undefined, undefined,
+    undefined, undefined, undefined,
+    undefined, undefined, undefined
+  ];
   const getGameData = () => _gameData;
 
   // cache dom
@@ -71,19 +75,84 @@ const gameController = (function() {
   const player2 = player1.getMark() === 'x' ? Player('o') : Player('x');
 
   // bind events
-  _board.addEventListener('click', _placeMark);
+  _board.addEventListener('click', _playRound);
 
-  // turn variable
-  let _turn = player1.getMark() === 'x' ? player1 : player2;
+  // active player variable
+  let _activePlayer = player1.getMark() === 'x' ? player1 : player2;
 
   // place mark when board is clicked
-  function _placeMark(e) {
+  function _playRound(e) {
     const cellIndex = e.target.dataset.index;
+    const mark = _activePlayer.getMark();
     // if no mark on cell
     if (cellIndex !== undefined && gameboard.getGameData()[cellIndex] === undefined) {
       // add appropriate mark to square and change appropriate mark in _gameData array
-      gameboard.placeMark(_turn.getMark(), cellIndex);
-      _turn = _turn === player1 ? player2 : player1; // change turn
+      gameboard.placeMark(mark, cellIndex);
+      
+      _checkGameOver();
+      _switchActivePlayer();
+    }
+
+    // change turn
+    function _switchActivePlayer() {
+      _activePlayer = mark === player1.getMark() ? player2 : player1;
+    }
+
+    // check if conditions are met to end game
+    function _checkGameOver() {
+      gameData = gameboard.getGameData();
+      const mark = _activePlayer.getMark();
+
+      console.log(`win? ${checkWin()}`);
+      console.log(`tie? ${checkTie()}`);
+      // if (checkWin()) {
+      //   // do something
+      // } elif (checkTie()) {
+      //   // do something else
+      // }
+
+      function checkWin() {
+        // 8 possible ways to win
+        const waysToWin = [
+          // horizontal
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          // vertical
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          // diagonal
+          [0, 4, 8],
+          [2, 4, 6]
+        ];
+
+        // iterate over each way to win
+        for (let i = 0; i < waysToWin.length; i++) {
+          const wayToWin = waysToWin[i];
+          let count = 0; // set count to 0
+          // iterate over each n in wayToWin
+          for (let j = 0; j < wayToWin.length; j++) {
+            const n = wayToWin[j];
+            // if gameData el at nth index doesn't equal mark, break out of loop
+            if (gameData[n] !== mark) break;
+            count++; // else, increment count
+          }
+
+          if (count === 3) return true; // if count is 3, return true
+        }
+          
+        return false;
+      }
+
+      function checkTie() {
+        // iterate over gameData
+        for (let i = 0; i < gameData.length; i++) {
+          if (!gameData[i]) return false; // if no mark, return false
+        }
+
+        return true;
+      }
     }
   }
 
