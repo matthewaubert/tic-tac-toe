@@ -81,25 +81,26 @@ const displayController = (function() {
   const _gameOverBanner = document.querySelector('#game-over');
   const _setup = document.querySelector('#setup');
   const _nameInput = _setup.querySelector('#name');
-  const _submit = _setup.querySelector('#submit');
+  const _submitBtn = _setup.querySelector('#submit');
   const _setup1 = _setup.querySelector('#setup1');
   const _h3 = _setup.querySelector('#setup2 h3');
-  const gameOverText = _gameOverBanner.querySelector('h2');
-  const congrats = _gameOverBanner.querySelector('h4');
+  const _gameOverText = _gameOverBanner.querySelector('h2');
+  const _congrats = _gameOverBanner.querySelector('h4');
   
-  // toggle 'Game Over' banner that announces result of game, congratulates winner
+  // show 'Game Over' banner that announces result of game, congratulates winner
   function renderGameOver(result) {
       if (result === 'tie') { // if game resulted in a tie
-        if (!congrats.classList.contains('hidden')) congrats.classList.add('hidden');
-        gameOverText.innerText = "It's a draw!";
+        if (!_congrats.classList.contains('hidden')) _congrats.classList.add('hidden');
+        _gameOverText.innerText = "It's a draw!";
       } else { // if game resulted in a win
-        congrats.classList.remove('hidden');
-        gameOverText.innerText = `${gameController.getActivePlayer().getName()} wins!`;
+        _congrats.classList.remove('hidden');
+        _gameOverText.innerText = `${gameController.getActivePlayer().getName()} wins!`;
       }
 
     _gameOverBanner.classList.remove('hidden');
   }
 
+  // hide 'Game Over' banner
   function clearGameOver() {
     _gameOverBanner.classList.add('hidden');
   }
@@ -108,15 +109,24 @@ const displayController = (function() {
   function removeSetup1() {
     _setup1.classList.add('hidden');
     _nameInput.value = '';
-    _submit.innerText = 'Play Game';
+    _submitBtn.innerText = 'Play Game';
     _h3.innerText = 'Player 2, enter your name';
   }
 
-  function removeSetup2() {
-    _setup.classList.add('hidden');
+  function _showSetup1() {
+    _setup1.classList.remove('hidden');
+    _nameInput.value = '';
+    _submitBtn.innerText = 'Next';
+    _h3.innerText = 'Player 1, enter your name';
   }
 
-  return { renderGameOver, clearGameOver, removeSetup1, removeSetup2 };
+  // toggle entire setup page
+  function toggleSetup() {
+    _setup.classList.toggle('hidden');
+    if (_setup1.classList.contains('hidden')) _showSetup1();
+  }
+
+  return { renderGameOver, clearGameOver, removeSetup1, toggleSetup };
 
 })();
 
@@ -128,9 +138,9 @@ const gameController = (function() {
   const _board = document.querySelector('#gameboard');
   const _markBtns = document.querySelectorAll('.mark-btn');
   const _nameInput = document.querySelector('#name');
-  const _submit = document.querySelector('#submit');
+  const _submitBtn = document.querySelector('#submit');
   const _playAgain = document.querySelector('#play-again');
-  const _quit = document.querySelector('#quit');
+  const _quitBtn = document.querySelector('#quit');
 
   // cache Player objects
   let _player1Selection;
@@ -140,11 +150,11 @@ const gameController = (function() {
   let _activePlayer;
 
   // bind events
-  // _board.addEventListener('click', _placeMark);
   _markBtns.forEach(button => button.addEventListener('click', _selectMark));
   const _createPlayer = _createPlayerSetup();
-  _submit.addEventListener('click', _createPlayer);
+  _submitBtn.addEventListener('click', _createPlayer);
   _playAgain.addEventListener('click', _playRound);
+  _quitBtn.addEventListener('click', _quitGame);
 
   // getters
   const getActivePlayer = () => _activePlayer;
@@ -259,23 +269,29 @@ const gameController = (function() {
     let count = 0;
 
     return (function() {
-      // if first time running func
-      if (count === 0) {
+      // if count is even
+      if (count % 2 === 0) {
         // create player
         const name = _nameInput.value || 'Player 1';
         _player1 = Player(_player1Selection || 'x', name);
         displayController.removeSetup1();
         count++;
 
-      // if second time running func
-      } else if (count === 1) {
+      // if count is odd
+      } else if (count % 2 === 1) {
         // create player
         const name = _nameInput.value || 'Player 2';
         _player2 = Player(_player2Selection || 'o', name);
-        displayController.removeSetup2();
+        displayController.toggleSetup();
         _playRound();
+        count++;
       }
     })
+  }
+
+  function _quitGame() {
+    displayController.clearGameOver();
+    displayController.toggleSetup();
   }
 
   return { getActivePlayer };
