@@ -186,9 +186,14 @@ h4 {
   gap: var(--gap-250);
 }
 
-#setup > div > div {
+#setup1 > div {
   display: flex;
-  gap: var(--gap-250);
+  gap: var(--gap-100);
+}
+
+#setup2 > div {
+  display: flex;
+  gap: var(--gap-300);
 }
 
 #setup2 > div {
@@ -222,7 +227,7 @@ h4 {
 }
 
 #setup span:hover,
-#setup span.focus{
+#setup span.focus {
   background-color: var(--indigo-900);
   box-shadow: 0 2px 5px rgba(0,0,0,0.7);
   cursor: pointer;

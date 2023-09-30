@@ -52,7 +52,12 @@ const gameboard = (function() {
     return svg;
   }
 
-  return { getGameData, setMark };
+  function clearBoard() {
+    _gameData.forEach((el, i, array) => array[i] = undefined);
+    _cells.forEach(cell => cell.replaceChildren());
+  }
+
+  return { getGameData, setMark, clearBoard };
 
 })();
 
@@ -79,20 +84,24 @@ const displayController = (function() {
   const _submit = _setup.querySelector('#submit');
   const _setup1 = _setup.querySelector('#setup1');
   const _h3 = _setup.querySelector('#setup2 h3');
+  const gameOverText = _gameOverBanner.querySelector('h2');
+  const congrats = _gameOverBanner.querySelector('h4');
   
-  // show 'Game Over' banner that announces result of game, congratulates winner
+  // toggle 'Game Over' banner that announces result of game, congratulates winner
   function renderGameOver(result) {
-    const h2 = _gameOverBanner.querySelector('h2');
-
-    if (result === 'tie') { // if game resulted in a tie
-      h2.innerText = "It's a draw!";
-    } else { // if game resulted in a win
-      const h4 = _gameOverBanner.querySelector('h4');
-      h4.classList.remove('hidden');
-      h2.innerText = `${gameController.getActivePlayer().getName()} wins!`;
-    }
+      if (result === 'tie') { // if game resulted in a tie
+        if (!congrats.classList.contains('hidden')) congrats.classList.add('hidden');
+        gameOverText.innerText = "It's a draw!";
+      } else { // if game resulted in a win
+        congrats.classList.remove('hidden');
+        gameOverText.innerText = `${gameController.getActivePlayer().getName()} wins!`;
+      }
 
     _gameOverBanner.classList.remove('hidden');
+  }
+
+  function clearGameOver() {
+    _gameOverBanner.classList.add('hidden');
   }
 
   // remove setup1 HTML, change setup2 text
@@ -107,7 +116,7 @@ const displayController = (function() {
     _setup.classList.add('hidden');
   }
 
-  return { renderGameOver, removeSetup1, removeSetup2 };
+  return { renderGameOver, clearGameOver, removeSetup1, removeSetup2 };
 
 })();
 
@@ -120,6 +129,8 @@ const gameController = (function() {
   const _markBtns = document.querySelectorAll('.mark-btn');
   const _nameInput = document.querySelector('#name');
   const _submit = document.querySelector('#submit');
+  const _playAgain = document.querySelector('#play-again');
+  const _quit = document.querySelector('#quit');
 
   // cache Player objects
   let _player1Selection;
@@ -129,16 +140,25 @@ const gameController = (function() {
   let _activePlayer;
 
   // bind events
-  _board.addEventListener('click', _playRound);
+  // _board.addEventListener('click', _placeMark);
   _markBtns.forEach(button => button.addEventListener('click', _selectMark));
   const _createPlayer = _createPlayerSetup();
   _submit.addEventListener('click', _createPlayer);
+  _playAgain.addEventListener('click', _playRound);
 
   // getters
   const getActivePlayer = () => _activePlayer;
 
+  function _playRound() {
+    displayController.clearGameOver(); // remove 'game over' banner
+    gameboard.clearBoard();
+    _activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
+    _board.addEventListener('click', _placeMark);
+    _board.classList.add('active');
+  }
+
   // place mark when board is clicked
-  function _playRound(e) {
+  function _placeMark(e) {
     const cellIndex = e.target.dataset.index;
     const mark = _activePlayer.getMark();
     // if no mark on cell
@@ -172,8 +192,8 @@ const gameController = (function() {
         displayController.renderGameOver('tie');
       }
       
-      if(win || tie) {
-        _board.removeEventListener('click', _playRound);
+      if (win || tie) {
+        _board.removeEventListener('click', _placeMark);
         _board.classList.remove('active');
         return true;
       } else {
@@ -238,7 +258,7 @@ const gameController = (function() {
   function _createPlayerSetup() {
     let count = 0;
 
-    return () => {
+    return (function() {
       // if first time running func
       if (count === 0) {
         // create player
@@ -252,10 +272,10 @@ const gameController = (function() {
         // create player
         const name = _nameInput.value || 'Player 2';
         _player2 = Player(_player2Selection || 'o', name);
-        _activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
         displayController.removeSetup2();
+        _playRound();
       }
-    }
+    })
   }
 
   return { getActivePlayer };
