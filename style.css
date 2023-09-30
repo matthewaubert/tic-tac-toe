@@ -114,7 +114,8 @@ h4 {
 
 .hidden,
 #game-over.hidden,
-#setup .hidden {
+#setup.hidden,
+#setup1.hidden {
   display: none;
 }
 
@@ -176,8 +177,8 @@ h4 {
   width: 100%;
 }
 
-.setup1,
-.setup2 {
+#setup1,
+#setup2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -190,7 +191,7 @@ h4 {
   gap: var(--gap-250);
 }
 
-.setup2 > div {
+#setup2 > div {
   margin-top: var(--gap-200);
 }
 
@@ -220,7 +221,8 @@ h4 {
   padding: var(--gap-200);
 }
 
-#setup span:hover {
+#setup span:hover,
+#setup span.focus{
   background-color: var(--indigo-900);
   box-shadow: 0 2px 5px rgba(0,0,0,0.7);
   cursor: pointer;
