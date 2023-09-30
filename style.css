@@ -43,7 +43,7 @@
   --gap-700: 2.8rem;
   --gap-1000: 4rem;
   font-family: var(--font-stack);
-  letter-spacing: calc(0.01rem + 0.1vw);
+  letter-spacing: calc(0.08rem + 0.01vw);
 }
 
 * {
@@ -90,8 +90,9 @@ input[type="text"] {
   padding: var(--gap-200) var(--gap-300);
 }
 
-h1, h2, h4 {
-  line-height: 100%;
+h1, h2, h3, h4 {
+  line-height: 120%;
+  text-align: center;
 }
 
 h2 {
@@ -102,7 +103,7 @@ h2 {
 
 h3 {
   color: var(--amber-400);
-  font-size: 2.4rem;
+  font-size: calc(2rem + 0.5vw);
   font-weight: 600;
 }
 
@@ -170,6 +171,7 @@ h4 {
   gap: var(--gap-1000);
   justify-content: center;
   align-items: center;
+  padding: var(--gap-600);
   position: fixed;
   top: 0;
   left: 0;
@@ -184,6 +186,7 @@ h4 {
   justify-content: center;
   align-items: center;
   gap: var(--gap-250);
+  max-width: 100%;
 }
 
 #setup1 > div {
@@ -194,10 +197,8 @@ h4 {
 #setup2 > div {
   display: flex;
   gap: var(--gap-300);
-}
-
-#setup2 > div {
   margin-top: var(--gap-200);
+  max-width: 100%;
 }
 
 #setup input[type="text"],
@@ -219,6 +220,7 @@ h4 {
 #setup button {
   color: var(--indigo-950);
   background-color: var(--amber-400);
+  max-width: 100%;
 }
 
 #setup span {
@@ -270,4 +272,15 @@ h4 {
 
 #game-over #quit {
   background-color: var(--indigo-400);
+}
+
+
+/* mobile media query */
+
+@media only screen and (max-width: 550px) {
+  
+  #setup2 > div {
+    flex-direction: column;
+  }
+
 }

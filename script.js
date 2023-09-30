@@ -117,7 +117,7 @@ const displayController = (function() {
     _setup1.classList.remove('hidden');
     _nameInput.value = '';
     _submitBtn.innerText = 'Next';
-    _h3.innerText = 'Player 1, enter your name';
+    _h3.innerText = 'Enter your name';
   }
 
   // toggle entire setup page
