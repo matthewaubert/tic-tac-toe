@@ -7,15 +7,17 @@ const gameboard = (function() {
     undefined, undefined, undefined,
     undefined, undefined, undefined
   ];
-  const getGameData = () => _gameData;
-
+  
   // cache dom
   const _cells = document.querySelectorAll('.cell');
+  
+  // getters
+  const getGameData = () => _gameData;
 
   _renderAll();
 
   // change mark in _gameData array and render cell
-  function placeMark (mark, index) {
+  function setMark (mark, index) {
     _gameData.splice(index, 1, mark);
     _render(_cells[index], index);
   }
@@ -50,16 +52,18 @@ const gameboard = (function() {
     return svg;
   }
 
-  return { getGameData, placeMark };
+  return { getGameData, setMark };
 
 })();
 
 // factory function to create player objects
-function Player(mark) {
+function Player(mark, name) {
 
+  // getters
   const getMark = () => mark;
+  const getName = () => name;
 
-  return { getMark };
+  return { getMark, getName };
 
 };
 
@@ -70,46 +74,59 @@ const gameController = (function() {
   const _board = document.querySelector('#gameboard');
 
   // cache Player objects
-  const _playerSelection = 'x';
-  const _player1 = Player(_playerSelection);
-  const _player2 = _player1.getMark() === 'x' ? Player('o') : Player('x');
-  let activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
+  const _player1Selection = 'x';
+  const _player2Selection = _player1Selection === 'x' ? 'o' : 'x';
+  const _player1 = Player(_player1Selection, 'Player 1');
+  const _player2 = Player(_player2Selection, 'Player 2');
+  let _activePlayer = _player1Selection === 'x' ? _player1 : _player2;
 
   // bind events
   _board.addEventListener('click', _playRound);
 
+  // getters
+  const getActivePlayer = () => _activePlayer;
+
   // place mark when board is clicked
   function _playRound(e) {
     const cellIndex = e.target.dataset.index;
-    const mark = activePlayer.getMark();
+    const mark = _activePlayer.getMark();
     // if no mark on cell
     if (cellIndex !== undefined && gameboard.getGameData()[cellIndex] === undefined) {
       // add appropriate mark to square and change appropriate mark in _gameData array
-      gameboard.placeMark(mark, cellIndex);
+      gameboard.setMark(mark, cellIndex);
       
-      _checkGameOver();
+      if (_checkGameOver()) return;
       _switchActivePlayer();
     }
 
     // change turn
     function _switchActivePlayer() {
-      activePlayer = mark === _player1.getMark() ? _player2 : _player1;
+      _activePlayer = mark === _player1.getMark() ? _player2 : _player1;
+      console.log(`active player: ${_activePlayer.getName()}`);
     }
 
     // check if conditions are met to end game
     function _checkGameOver() {
       gameData = gameboard.getGameData();
-      const mark = activePlayer.getMark();
-
-      console.log(`win? ${checkWin()}`);
-      console.log(`tie? ${checkTie()}`);
-
-      if (checkWin()) {
+      const mark = _activePlayer.getMark();
+      
+      const win = checkWin();
+      const tie = checkTie();
+      console.log('win? ' + win);
+      console.log('tie? ' + tie);
+      
+      if (win) {
         displayController.renderGameOver('win');
-        _board.removeEventListener('click', _playRound);
-      } else if (checkTie()) {
+      } else if (tie) {
         displayController.renderGameOver('tie');
+      }
+      
+      if(win || tie) {
         _board.removeEventListener('click', _playRound);
+        _board.classList.remove('active');
+        return true;
+      } else {
+        return false;
       }
 
       function checkWin() {
@@ -157,7 +174,7 @@ const gameController = (function() {
     }
   }
 
-  return { activePlayer };
+  return { getActivePlayer };
 
 })();
 
@@ -166,10 +183,20 @@ const displayController = (function() {
 
   // cache DOM
   const _gameOverBanner = document.querySelector('#game-over');
-
+  
   // show 'Game Over' banner that announces result of game, congratulates winner
-  function renderGameOver() {
-    _gameOverBanner.classList.toggle('hidden');
+  function renderGameOver(result) {
+    const h2 = _gameOverBanner.querySelector('h2');
+
+    if (result === 'tie') { // if game resulted in a tie
+      h2.innerText = "It's a draw!";
+    } else { // if game resulted in a win
+      const h4 = _gameOverBanner.querySelector('h4');
+      h4.classList.remove('hidden');
+      h2.innerText = `${gameController.getActivePlayer().getName()} wins!`;
+    }
+
+    _gameOverBanner.classList.remove('hidden');
   }
 
   return { renderGameOver };
