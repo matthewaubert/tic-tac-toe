@@ -213,11 +213,13 @@ const gameController = (function() {
   const _restartBtn = document.querySelector('.restart');
 
   // cache Player objects
-  let _player1Selection;
-  let _player2Selection;
-  let _player1;
-  let _player2;
-  let _activePlayer;
+  const _playerCache = {
+    player1Selection: undefined,
+    player2Selection: undefined,
+    player1: undefined,
+    player2: undefined,
+    activePlayer: undefined
+  };
 
   // bind events
   _markBtns.forEach(button => button.addEventListener('click', _selectMark));
@@ -228,7 +230,7 @@ const gameController = (function() {
   _restartBtn.addEventListener('click', _restartRound);
 
   // getters
-  const getActivePlayer = () => _activePlayer;
+  const getActivePlayer = () => _playerCache.activePlayer;
 
   // play a round of tic-tac-toe
   function _playRound() {
@@ -240,13 +242,13 @@ const gameController = (function() {
 
   function _restartRound() {
     gameboard.clearBoard();
-    _activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
+    _playerCache.activePlayer = _playerCache.player1.getMark() === 'x' ? _playerCache.player1 : _playerCache.player2;
   }
 
   // place mark when board is clicked
   function _placeMark(e) {
     const cellIndex = e.target.dataset.index;
-    const mark = _activePlayer.getMark();
+    const mark = _playerCache.activePlayer.getMark();
     // if no mark on cell
     if (cellIndex !== undefined && gameboard.getGameData()[cellIndex] === undefined) {
       // add appropriate mark to square and change appropriate mark in _boardData array
@@ -258,14 +260,14 @@ const gameController = (function() {
 
     // change turn
     function _switchActivePlayer() {
-      _activePlayer = mark === _player1.getMark() ? _player2 : _player1;
-      console.log(`active player: ${_activePlayer.getName()}`);
+      _playerCache.activePlayer = mark === _playerCache.player1.getMark() ? _playerCache.player2 : _playerCache.player1;
+      console.log(`active player: ${_playerCache.activePlayer.getName()}`);
     }
 
     // check if conditions are met to end game
     function _checkGameOver() {
       gameData = gameboard.getGameData();
-      const mark = _activePlayer.getMark();
+      const mark = _playerCache.activePlayer.getMark();
       
       const win = checkWin();
       const tie = checkTie();
@@ -273,7 +275,7 @@ const gameController = (function() {
       console.log('tie? ' + tie);
       
       if (win) {
-        scoreboard.updateScore(_activePlayer.getName());
+        scoreboard.updateScore(_playerCache.activePlayer.getName());
         displayController.renderGameOver('win');
       } else if (tie) {
         scoreboard.updateScore();
@@ -339,8 +341,8 @@ const gameController = (function() {
     _markBtns.forEach(button => button.classList.remove('focus')); // remove focus from mark btns
     this.classList.add('focus'); // add focus to correct mark btn
 
-    _player1Selection = this.dataset.value;
-    _player2Selection = _player1Selection === 'x' ? 'o' : 'x';
+    _playerCache.player1Selection = this.dataset.value;
+    _playerCache.player2Selection = _playerCache.player1Selection === 'x' ? 'o' : 'x';
   }
 
   function _createPlayerSetup() {
@@ -352,17 +354,17 @@ const gameController = (function() {
       if (count % 2 === 0) {
         count++;
         const name = _nameInput.value || 'Player 1'; // create player 1
-        _player1 = Player(_player1Selection || 'x', name);
+        _playerCache.player1 = Player(_playerCache.player1Selection || 'x', name);
         displayController.hideSetup1();
 
       // if count is odd
       } else if (count % 2 === 1) {
         count++;
         const name = _nameInput.value || 'Player 2'; // create player 2
-        _player2 = Player(_player2Selection || 'o', name);
+        _playerCache.player2 = Player(_playerCache.player2Selection || 'o', name);
         displayController.toggleSetup();
 
-        scoreboard.nameScoreBoard(_player1, _player2);
+        scoreboard.nameScoreBoard(_playerCache.player1, _playerCache.player2);
         _playRound();
       }
     })
@@ -373,6 +375,11 @@ const gameController = (function() {
     displayController.hideGameOver();
     displayController.toggleSetup();
     _markBtns.forEach(button => button.classList.remove('focus')); // remove focus from mark btns
+
+    // reset playerCache to undefined
+    for (let key in _playerCache) {
+      _playerCache[key] = undefined;
+    }
   }
 
   return { getActivePlayer };

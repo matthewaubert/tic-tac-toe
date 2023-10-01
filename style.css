@@ -127,6 +127,7 @@ h5 {
 
 p {
   font-size: calc(0.8rem + 0.35vw);
+  font-weight: 500;
   letter-spacing: normal;
 }
 
