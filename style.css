@@ -1,45 +1,24 @@
 /* general */
 
 :root {
-  --amber-100: #fef3c7;
-  --amber-200: #fde68a;
-  --amber-300: #fcd34d;
   --amber-400: #fbbf24;
   --amber-500: #f59e0b;
-  --amber-600: #d97706;
-  --amber-700: #b45309;
-  --amber-800: #92400e;
-  --amber-900: #78350f;
-  --amber-950: #451a03;
-  --yellow-500: #eab308;
-  --cyan-950: #083344;
-  --blue-950: #172554;
-  --indigo-100: #e0e7ff;
-  --indigo-200: #c7d2fe;
-  --indigo-300: #a5b4fc;
   --indigo-400: #818cf8;
   --indigo-500: #6366f1;
   --indigo-600: #4f46e5;
-  --indigo-700: #4338ca;
-  --indigo-800: #3730a3;
   --indigo-900: #312e81;
   --indigo-925: #262364;
   --indigo-950: #1e1b4b;
   --indigo-975: #18163c;
-  /* --indigo-975: #161437; */
   --violet-400: #a78bfa;
   --violet-500: #8b5cf6;
-  --violet-600: #7c3aed;
   --font-stack: "Fredoka", "Helvetica", "Arial", sans-serif;
-  --gap-050: 0.2rem;
   --gap-100: 0.4rem;
   --gap-150: 0.6rem;
   --gap-200: 0.8rem;
   --gap-250: 1.0rem;
   --gap-300: 1.2rem;
-  --gap-350: 1.4rem;
   --gap-400: 1.6rem;
-  --gap-500: 2.0rem;
   --gap-600: 2.4rem;
   --gap-700: 2.8rem;
   --gap-800: 3.2rem;
@@ -79,6 +58,7 @@ button, input[type="text"] {
   border-radius: 12px;
   color: var(--indigo-950);
   font-family: var(--font-stack);
+  font-weight: 500;
 }
 
 button {
@@ -126,7 +106,7 @@ h5 {
 }
 
 p {
-  font-size: calc(0.8rem + 0.35vw);
+  font-size: calc(0.75rem + 0.25vw);
   font-weight: 500;
   letter-spacing: normal;
 }
@@ -226,7 +206,7 @@ header button > svg {
   flex-direction: column;
   background-color: var(--indigo-600);
   border-radius: min(21px, 4vw);
-  padding: var(--gap-200);
+  padding: var(--gap-200) var(--gap-150);
 }
 
 .xlite {
