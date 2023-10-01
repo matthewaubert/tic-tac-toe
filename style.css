@@ -226,12 +226,12 @@ p {
   max-width: 100%;
 }
 
-#setup1 > div {
+#setup1 > div:nth-child(2) {
   display: flex;
   gap: var(--gap-100);
 }
 
-#setup2 > div {
+#setup2 > form {
   display: flex;
   gap: var(--gap-300);
   margin-top: var(--gap-200);

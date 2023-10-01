@@ -84,9 +84,7 @@ const scoreboard = (function() {
     p2: _scoreTiles[2],
     ties: _scoreTiles[1]
   };
-
-  let p1Name;
-
+  
   // cache scores
   const _scoreData = {
     p1: 0,
@@ -94,10 +92,12 @@ const scoreboard = (function() {
     ties: 0
   };
 
+  let player1Name;
+
   // increment score data of ties or appropriate player
   function updateScore(winner) {
     if (winner) {
-      p1Name === winner ? _scoreData.p1++ : _scoreData.p2++; // increment score of correct player
+      player1Name === winner ? _scoreData.p1++ : _scoreData.p2++; // increment score of correct player
     } else {
       _scoreData.ties++; // increment score.ties
     }
@@ -119,7 +119,7 @@ const scoreboard = (function() {
     _scoreDisplay.ties.children[1].innerText = _scoreData.ties;
   }
 
-  //
+  // add player names to scoreboard display and color tiles based on mark
   function nameScoreBoard(player1, player2) {
     _scoreDisplay.p1.children[0].innerText = player1.getName();
     _scoreDisplay.p2.children[0].innerText = player2.getName();
@@ -135,7 +135,7 @@ const scoreboard = (function() {
       _scoreDisplay.p2.classList.add('xlite');
     }
 
-    p1Name = player1.getName();
+    player1Name = player1.getName();
   }
 
   return { updateScore, resetScore, nameScoreBoard };
@@ -206,8 +206,8 @@ const gameController = (function() {
   // cache DOM
   const _board = document.querySelector('#gameboard');
   const _markBtns = document.querySelectorAll('.mark-btn');
-  const _nameInput = document.querySelector('#name');
-  const _submitBtn = document.querySelector('#submit');
+  const _nameForm = document.querySelector('form');
+  const _nameInput = _nameForm.querySelector('#name');
   const _playAgain = document.querySelector('#play-again');
   const _quitBtn = document.querySelector('#quit');
 
@@ -221,13 +221,14 @@ const gameController = (function() {
   // bind events
   _markBtns.forEach(button => button.addEventListener('click', _selectMark));
   const _createPlayer = _createPlayerSetup();
-  _submitBtn.addEventListener('click', _createPlayer);
+  _nameForm.addEventListener('submit', _createPlayer);
   _playAgain.addEventListener('click', _playRound);
   _quitBtn.addEventListener('click', _quitGame);
 
   // getters
   const getActivePlayer = () => _activePlayer;
 
+  // play a round of tic-tac-toe
   function _playRound() {
     displayController.hideGameOver(); // remove 'game over' banner
     gameboard.clearBoard();
@@ -339,7 +340,8 @@ const gameController = (function() {
   function _createPlayerSetup() {
     let count = 0;
 
-    return (function() {
+    return (function(e) {
+      e.preventDefault();
       // if count is even
       if (count % 2 === 0) {
         count++;
@@ -364,6 +366,7 @@ const gameController = (function() {
     scoreboard.resetScore();
     displayController.hideGameOver();
     displayController.toggleSetup();
+    _markBtns.forEach(button => button.classList.remove('focus')); // remove focus from mark btns
   }
 
   return { getActivePlayer };
