@@ -33,6 +33,7 @@
   --font-stack: "Fredoka", "Helvetica", "Arial", sans-serif;
   --gap-050: 0.2rem;
   --gap-100: 0.4rem;
+  --gap-150: 0.6rem;
   --gap-200: 0.8rem;
   --gap-250: 1.0rem;
   --gap-300: 1.2rem;
@@ -41,6 +42,7 @@
   --gap-500: 2.0rem;
   --gap-600: 2.4rem;
   --gap-700: 2.8rem;
+  --gap-800: 3.2rem;
   --gap-1000: 4rem;
   font-family: var(--font-stack);
   letter-spacing: calc(0.08rem + 0.01vw);
@@ -84,6 +86,11 @@ button {
   cursor: pointer;
   font-size: 1.4rem;
   padding: var(--gap-300) var(--gap-400);
+}
+
+button:hover {
+  box-shadow: 0 2px 7px rgba(0,0,0,0.9);
+  filter: brightness(110%);
 }
 
 input[type="text"] {
@@ -133,6 +140,36 @@ p {
 
 /* header */
 
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+header img {
+  height: var(--gap-800);
+}
+
+header > div {
+  display: flex;
+  gap: var(--gap-150);
+}
+
+header button {
+  background-color: var(--indigo-600);
+  height: var(--gap-800);
+  width: var(--gap-800);
+  padding: var(--gap-200);
+}
+
+header button:hover {
+  background-color: var(--amber-400);
+  filter: brightness(100%);
+}
+
+header button > svg {
+  fill: var(--indigo-950);
+}
+
 
 /* gameboard */
 
@@ -171,6 +208,7 @@ p {
 .o {
   fill: var(--amber-500);
 }
+
 
 /* scoreboard */
 
@@ -303,11 +341,11 @@ p {
   margin-top: var(--gap-200);
 }
 
-#game-over #play-again {
+#game-over .play-again {
   background-color: var(--amber-400);
 }
 
-#game-over #quit {
+#game-over .quit {
   background-color: var(--indigo-400);
 }
 

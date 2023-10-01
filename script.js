@@ -208,8 +208,9 @@ const gameController = (function() {
   const _markBtns = document.querySelectorAll('.mark-btn');
   const _nameForm = document.querySelector('form');
   const _nameInput = _nameForm.querySelector('#name');
-  const _playAgain = document.querySelector('#play-again');
-  const _quitBtn = document.querySelector('#quit');
+  const _playAgain = document.querySelector('.play-again');
+  const _quitBtns = document.querySelectorAll('.quit');
+  const _restartBtn = document.querySelector('.restart');
 
   // cache Player objects
   let _player1Selection;
@@ -223,18 +224,23 @@ const gameController = (function() {
   const _createPlayer = _createPlayerSetup();
   _nameForm.addEventListener('submit', _createPlayer);
   _playAgain.addEventListener('click', _playRound);
-  _quitBtn.addEventListener('click', _quitGame);
+  _quitBtns.forEach(button => button.addEventListener('click', _quitGame));
+  _restartBtn.addEventListener('click', _restartRound);
 
   // getters
   const getActivePlayer = () => _activePlayer;
 
   // play a round of tic-tac-toe
   function _playRound() {
+    _restartRound();
     displayController.hideGameOver(); // remove 'game over' banner
-    gameboard.clearBoard();
-    _activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
     _board.addEventListener('click', _placeMark);
     _board.classList.add('active');
+  }
+
+  function _restartRound() {
+    gameboard.clearBoard();
+    _activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
   }
 
   // place mark when board is clicked
