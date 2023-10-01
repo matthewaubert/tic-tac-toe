@@ -12,19 +12,32 @@
 </head>
 <body>
 
-  <main>
-    <div id="gameboard">
-      <div class="cell" data-index="0"></div>
-      <div class="cell" data-index="1"></div>
-      <div class="cell" data-index="2"></div>
-      <div class="cell" data-index="3"></div>
-      <div class="cell" data-index="4"></div>
-      <div class="cell" data-index="5"></div>
-      <div class="cell" data-index="6"></div>
-      <div class="cell" data-index="7"></div>
-      <div class="cell" data-index="8"></div>
-    </div>
+  <main id="gameboard">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
   </main>
+
+  <footer id="scoreboard">
+    <div class="score" id="score-p1">
+      <p>Player 1</p>
+      <h4>0</h4>
+    </div>
+    <div class="score" id="score-ties">
+      <p>Ties</p>
+      <h4>0</h4>
+    </div>
+    <div class="score" id="score-p2">
+      <p>Player 2</p>
+      <h4>0</h4>
+    </div>
+  </footer>
 
   <section id="setup">
     <div id="setup1">
@@ -54,7 +67,7 @@
   </section>
 
   <section id="game-over" class="hidden">
-    <h4 class="hidden">Congratulations!</h4>
+    <h5 class="hidden">Congratulations!</h5>
     <h2>Player 1 wins</h2>
     <div>
       <button id="play-again">Play Again</button>

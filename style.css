@@ -44,6 +44,7 @@
   --gap-1000: 4rem;
   font-family: var(--font-stack);
   letter-spacing: calc(0.08rem + 0.01vw);
+  text-align: center;
 }
 
 * {
@@ -65,6 +66,7 @@ body {
   display: grid;
   position: relative;
   place-content: center;
+  gap: var(--gap-600);
   background-color: var(--indigo-950);
   height: 100%;
 }
@@ -74,7 +76,6 @@ button, input[type="text"] {
   border: none;
   border-radius: 12px;
   color: var(--indigo-950);
-  /* min(12px, 2.3vw); */
   font-family: var(--font-stack);
 }
 
@@ -92,7 +93,6 @@ input[type="text"] {
 
 h1, h2, h3, h4 {
   line-height: 120%;
-  text-align: center;
 }
 
 h2 {
@@ -108,9 +108,19 @@ h3 {
 }
 
 h4 {
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+h5 {
   color: var(--indigo-400);
   font-size: 1.8rem;
   font-weight: 500;
+}
+
+p {
+  font-size: calc(0.8rem + 0.35vw);
+  letter-spacing: normal;
 }
 
 .hidden,
@@ -161,6 +171,33 @@ h4 {
 .o {
   fill: var(--amber-500);
 }
+
+/* scoreboard */
+
+#scoreboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: min(1rem, 3vw);
+  width: min(26rem, 80vw);
+  color: var(--indigo-950);
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--indigo-600);
+  border-radius: min(21px, 4vw);
+  padding: var(--gap-200);
+}
+
+.xlite {
+  background-color: var(--violet-400);
+}
+
+.olite {
+  background-color: var(--amber-400);
+}
+
 
 /* setup */
 

@@ -2,7 +2,7 @@
 const gameboard = (function() {
 
   // array defining marks at each square: 'x', 'o', or undefined (i.e. unmarked)
-  const _gameData = [
+  const _boardData = [
     undefined, undefined, undefined,
     undefined, undefined, undefined,
     undefined, undefined, undefined
@@ -12,13 +12,13 @@ const gameboard = (function() {
   const _cells = document.querySelectorAll('.cell');
   
   // getters
-  const getGameData = () => _gameData;
+  const getGameData = () => _boardData;
 
   _renderAll();
 
-  // change mark in _gameData array and render cell
+  // change mark in _boardData array and render cell
   function setMark (mark, index) {
-    _gameData.splice(index, 1, mark);
+    _boardData.splice(index, 1, mark);
     _render(_cells[index], index);
   }
 
@@ -27,8 +27,8 @@ const gameboard = (function() {
   }
 
   function _render(cell, index) {
-    if (_gameData[index] !== undefined) {
-      const mark = _createSvg(_gameData[index]); // create appropriate svg
+    if (_boardData[index] !== undefined) {
+      const mark = _createSvg(_boardData[index]); // create appropriate svg
       cell.appendChild(mark); // append svg to cell
     }
   }
@@ -53,7 +53,7 @@ const gameboard = (function() {
   }
 
   function clearBoard() {
-    _gameData.forEach((el, i, array) => array[i] = undefined);
+    _boardData.forEach((el, i, array) => array[i] = undefined);
     _cells.forEach(cell => cell.replaceChildren());
   }
 
@@ -85,28 +85,32 @@ const displayController = (function() {
   const _setup1 = _setup.querySelector('#setup1');
   const _h3 = _setup.querySelector('#setup2 h3');
   const _gameOverText = _gameOverBanner.querySelector('h2');
-  const _congrats = _gameOverBanner.querySelector('h4');
+  const _congrats = _gameOverBanner.querySelector('h5');
+  const scores = document.querySelectorAll('.score');
+  const scoreP1 = scores[0];
+  const scoreTies = scores[1];
+  const scoreP2 = scores[2];
   
   // show 'Game Over' banner that announces result of game, congratulates winner
   function renderGameOver(result) {
-      if (result === 'tie') { // if game resulted in a tie
-        if (!_congrats.classList.contains('hidden')) _congrats.classList.add('hidden');
-        _gameOverText.innerText = "It's a draw!";
-      } else { // if game resulted in a win
-        _congrats.classList.remove('hidden');
-        _gameOverText.innerText = `${gameController.getActivePlayer().getName()} wins!`;
-      }
+    if (result === 'tie') { // if game resulted in a tie
+      if (!_congrats.classList.contains('hidden')) _congrats.classList.add('hidden');
+      _gameOverText.innerText = "It's a draw!";
+    } else { // if game resulted in a win
+      _congrats.classList.remove('hidden');
+      _gameOverText.innerText = `${gameController.getActivePlayer().getName()} wins!`;
+    }
 
     _gameOverBanner.classList.remove('hidden');
   }
 
   // hide 'Game Over' banner
-  function clearGameOver() {
+  function hideGameOver() {
     _gameOverBanner.classList.add('hidden');
   }
 
   // remove setup1 HTML, change setup2 text
-  function removeSetup1() {
+  function hideSetup1() {
     _setup1.classList.add('hidden');
     _nameInput.value = '';
     _submitBtn.innerText = 'Play Game';
@@ -126,7 +130,30 @@ const displayController = (function() {
     if (_setup1.classList.contains('hidden')) _showSetup1();
   }
 
-  return { renderGameOver, clearGameOver, removeSetup1, toggleSetup };
+  function updateScore() {
+    const score = gameController.getScore();
+    scoreP1.children[1].innerText = score.p1;
+    scoreP2.children[1].innerText = score.p2;
+    scoreTies.children[1].innerText = score.ties;
+  }
+
+  function nameScoreBoard(player1, player2) {
+    scoreP1.children[0].innerText = player1.getName();
+    scoreP2.children[0].innerText = player2.getName();
+
+    scoreP1.classList.remove('xlite', 'olite');
+    scoreP2.classList.remove('xlite', 'olite');
+
+    if (player1.getMark() === 'x') {
+      scoreP1.classList.add('xlite');
+      scoreP2.classList.add('olite');
+    } else {
+      scoreP1.classList.add('olite');
+      scoreP2.classList.add('xlite');
+    }
+  }
+
+  return { renderGameOver, hideGameOver, hideSetup1, toggleSetup, updateScore, nameScoreBoard };
 
 })();
 
@@ -149,6 +176,14 @@ const gameController = (function() {
   let _player2;
   let _activePlayer;
 
+  // cache scores
+  const _score = {
+    p1: 0,
+    p2: 0,
+    ties: 0
+  };
+  const getScore = () => _score;
+
   // bind events
   _markBtns.forEach(button => button.addEventListener('click', _selectMark));
   const _createPlayer = _createPlayerSetup();
@@ -160,7 +195,7 @@ const gameController = (function() {
   const getActivePlayer = () => _activePlayer;
 
   function _playRound() {
-    displayController.clearGameOver(); // remove 'game over' banner
+    displayController.hideGameOver(); // remove 'game over' banner
     gameboard.clearBoard();
     _activePlayer = _player1.getMark() === 'x' ? _player1 : _player2;
     _board.addEventListener('click', _placeMark);
@@ -173,7 +208,7 @@ const gameController = (function() {
     const mark = _activePlayer.getMark();
     // if no mark on cell
     if (cellIndex !== undefined && gameboard.getGameData()[cellIndex] === undefined) {
-      // add appropriate mark to square and change appropriate mark in _gameData array
+      // add appropriate mark to square and change appropriate mark in _boardData array
       gameboard.setMark(mark, cellIndex);
       
       if (_checkGameOver()) return;
@@ -197,8 +232,10 @@ const gameController = (function() {
       console.log('tie? ' + tie);
       
       if (win) {
+        _updateScore(_activePlayer.getName());
         displayController.renderGameOver('win');
       } else if (tie) {
+        _updateScore();
         displayController.renderGameOver('tie');
       }
       
@@ -271,29 +308,46 @@ const gameController = (function() {
     return (function() {
       // if count is even
       if (count % 2 === 0) {
-        // create player
-        const name = _nameInput.value || 'Player 1';
-        _player1 = Player(_player1Selection || 'x', name);
-        displayController.removeSetup1();
         count++;
+        const name = _nameInput.value || 'Player 1'; // create player 1
+        _player1 = Player(_player1Selection || 'x', name);
+        displayController.hideSetup1();
 
       // if count is odd
       } else if (count % 2 === 1) {
-        // create player
-        const name = _nameInput.value || 'Player 2';
+        count++;
+        const name = _nameInput.value || 'Player 2'; // create player 2
         _player2 = Player(_player2Selection || 'o', name);
         displayController.toggleSetup();
+
+        displayController.nameScoreBoard(_player1, _player2);
         _playRound();
-        count++;
       }
     })
   }
 
   function _quitGame() {
-    displayController.clearGameOver();
+    _resetScore();
+    displayController.hideGameOver();
     displayController.toggleSetup();
   }
 
-  return { getActivePlayer };
+  function _updateScore(winner) {
+    if (winner) {
+      _player1.getName() === winner ? _score.p1++ : _score.p2++; // increment score of correct player
+    } else {
+      _score.ties++; // increment score.ties
+    }
+    displayController.updateScore();
+  }
+
+  function _resetScore() {
+    for (let score in _score) {
+      _score[score] = 0;
+      displayController.updateScore();
+    }
+  }
+
+  return { getActivePlayer, getScore };
 
 })();
