@@ -74,6 +74,75 @@ function Player(mark, name) {
 };
 
 
+// module to control scoreboard
+const scoreboard = (function() {
+
+  // cache DOM
+  const _scoreTiles = document.querySelectorAll('.score');
+  const _scoreDisplay = {
+    p1: _scoreTiles[0],
+    p2: _scoreTiles[2],
+    ties: _scoreTiles[1]
+  };
+
+  let p1Name;
+
+  // cache scores
+  const _scoreData = {
+    p1: 0,
+    p2: 0,
+    ties: 0
+  };
+
+  // increment score data of ties or appropriate player
+  function updateScore(winner) {
+    if (winner) {
+      p1Name === winner ? _scoreData.p1++ : _scoreData.p2++; // increment score of correct player
+    } else {
+      _scoreData.ties++; // increment score.ties
+    }
+    _renderScore();
+  }
+
+  // set all score data back to 0
+  function resetScore() {
+    for (let score in _scoreData) {
+      _scoreData[score] = 0;
+    }
+    _renderScore();
+  }
+
+  // update scoreboard after score data has been updated
+  function _renderScore() {
+    _scoreDisplay.p1.children[1].innerText = _scoreData.p1;
+    _scoreDisplay.p2.children[1].innerText = _scoreData.p2;
+    _scoreDisplay.ties.children[1].innerText = _scoreData.ties;
+  }
+
+  //
+  function nameScoreBoard(player1, player2) {
+    _scoreDisplay.p1.children[0].innerText = player1.getName();
+    _scoreDisplay.p2.children[0].innerText = player2.getName();
+
+    _scoreDisplay.p1.classList.remove('xlite', 'olite');
+    _scoreDisplay.p2.classList.remove('xlite', 'olite');
+
+    if (player1.getMark() === 'x') {
+      _scoreDisplay.p1.classList.add('xlite');
+      _scoreDisplay.p2.classList.add('olite');
+    } else {
+      _scoreDisplay.p1.classList.add('olite');
+      _scoreDisplay.p2.classList.add('xlite');
+    }
+
+    p1Name = player1.getName();
+  }
+
+  return { updateScore, resetScore, nameScoreBoard };
+
+})();
+
+
 // module to control misc display elements
 const displayController = (function() {
 
@@ -86,10 +155,6 @@ const displayController = (function() {
   const _h3 = _setup.querySelector('#setup2 h3');
   const _gameOverText = _gameOverBanner.querySelector('h2');
   const _congrats = _gameOverBanner.querySelector('h5');
-  const scores = document.querySelectorAll('.score');
-  const scoreP1 = scores[0];
-  const scoreTies = scores[1];
-  const scoreP2 = scores[2];
   
   // show 'Game Over' banner that announces result of game, congratulates winner
   function renderGameOver(result) {
@@ -130,30 +195,7 @@ const displayController = (function() {
     if (_setup1.classList.contains('hidden')) _showSetup1();
   }
 
-  function updateScore() {
-    const score = gameController.getScore();
-    scoreP1.children[1].innerText = score.p1;
-    scoreP2.children[1].innerText = score.p2;
-    scoreTies.children[1].innerText = score.ties;
-  }
-
-  function nameScoreBoard(player1, player2) {
-    scoreP1.children[0].innerText = player1.getName();
-    scoreP2.children[0].innerText = player2.getName();
-
-    scoreP1.classList.remove('xlite', 'olite');
-    scoreP2.classList.remove('xlite', 'olite');
-
-    if (player1.getMark() === 'x') {
-      scoreP1.classList.add('xlite');
-      scoreP2.classList.add('olite');
-    } else {
-      scoreP1.classList.add('olite');
-      scoreP2.classList.add('xlite');
-    }
-  }
-
-  return { renderGameOver, hideGameOver, hideSetup1, toggleSetup, updateScore, nameScoreBoard };
+  return { renderGameOver, hideGameOver, hideSetup1, toggleSetup };
 
 })();
 
@@ -175,14 +217,6 @@ const gameController = (function() {
   let _player1;
   let _player2;
   let _activePlayer;
-
-  // cache scores
-  const _score = {
-    p1: 0,
-    p2: 0,
-    ties: 0
-  };
-  const getScore = () => _score;
 
   // bind events
   _markBtns.forEach(button => button.addEventListener('click', _selectMark));
@@ -232,10 +266,10 @@ const gameController = (function() {
       console.log('tie? ' + tie);
       
       if (win) {
-        _updateScore(_activePlayer.getName());
+        scoreboard.updateScore(_activePlayer.getName());
         displayController.renderGameOver('win');
       } else if (tie) {
-        _updateScore();
+        scoreboard.updateScore();
         displayController.renderGameOver('tie');
       }
       
@@ -320,34 +354,18 @@ const gameController = (function() {
         _player2 = Player(_player2Selection || 'o', name);
         displayController.toggleSetup();
 
-        displayController.nameScoreBoard(_player1, _player2);
+        scoreboard.nameScoreBoard(_player1, _player2);
         _playRound();
       }
     })
   }
 
   function _quitGame() {
-    _resetScore();
+    scoreboard.resetScore();
     displayController.hideGameOver();
     displayController.toggleSetup();
   }
 
-  function _updateScore(winner) {
-    if (winner) {
-      _player1.getName() === winner ? _score.p1++ : _score.p2++; // increment score of correct player
-    } else {
-      _score.ties++; // increment score.ties
-    }
-    displayController.updateScore();
-  }
-
-  function _resetScore() {
-    for (let score in _score) {
-      _score[score] = 0;
-      displayController.updateScore();
-    }
-  }
-
-  return { getActivePlayer, getScore };
+  return { getActivePlayer };
 
 })();
