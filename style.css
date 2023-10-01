@@ -354,7 +354,7 @@ header button > svg {
 
 @media only screen and (max-width: 550px) {
   
-  #setup2 > div {
+  #setup2 > form {
     flex-direction: column;
   }
 
